@@ -14,7 +14,7 @@ l = () => {
     t = DEFAULT_UPDATE_TIME
   } = {}) => {
 
-    const d = document, M = Math, sA = 'setAttribute', makeBoard = ({
+    const d = document, M = Math, A = Array, cENS = 'createElementNS', sA = 'setAttribute', NS = 'http://www.w3.org/2000/svg', makeBoard = ({
       w,
       h,
       cellSize = MIN_CELL_SIZE,
@@ -32,7 +32,7 @@ l = () => {
         }
       }
       const makeCell = (i,j) => {
-        const cell = d.createElementNS('http://www.w3.org/2000/svg', 'path'); //Create a path in SVG's namespace
+        const cell = d[cENS](NS, 'path'); //Create a path in SVG's namespace
         cell[sA]('d',`M ${i*cellSize} ${j*cellSize} `
           + `L ${(i+1)*cellSize} ${j*cellSize} ${(i+1)*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${j*cellSize}`); //Set path's data
         svg.appendChild(cell);
@@ -54,10 +54,10 @@ l = () => {
         const padWidth = M.floor((x - maxWidth)/2);
 
         const centerY = (a,l, fillVal) => a.length < l
-          ? new Array(M.floor((l - a.length)/2)).fill(fillVal).concat(a, new Array(M.ceil((l - a.length)/2)).fill(fillVal))
+          ? new A(M.floor((l - a.length)/2)).fill(fillVal).concat(a, new A(M.ceil((l - a.length)/2)).fill(fillVal))
           : a;
         const centerX = (a, fillVal) => a.length < x
-          ? new Array(padWidth).fill(fillVal).concat(a, new Array(x - a.length - padWidth).fill(fillVal))
+          ? new A(padWidth).fill(fillVal).concat(a, new A(x - a.length - padWidth).fill(fillVal))
           : a;
 
         return centerY(ibsString.split('\n'), y, '').map(row=>centerX(row.split(''), '.').map(cell => cell === 'O'))
@@ -89,7 +89,7 @@ l = () => {
       }
 
       //create svg
-      let svg = d.createElementNS('http://www.w3.org/2000/svg', 'svg'); //Get svg element
+      let svg = d[cENS](NS, 'svg'); //Get svg element
       svg.style.position = 'absolute';
       svg.style.top = 0;
       svg.style.left = 0;
