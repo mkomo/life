@@ -5,7 +5,6 @@ l = () => {
   const DEFAULT_UPDATE_TIME = 50; //ms
   const MIN_CELL_SIZE = 10; //px
   const makeLife = ({
-    container = document.getElementsByTagName('body')[0],
     width = window.innerWidth,
     height = window.innerHeight,
     cellCountX,
@@ -18,7 +17,6 @@ l = () => {
     document.title = documentTitle;
 
     const makeBoard = ({
-      container,
       width,
       height,
       cellSize = MIN_CELL_SIZE,
@@ -92,16 +90,14 @@ l = () => {
 
       //create svg
       let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); //Get svg element
-      if (container === document.getElementsByTagName('body')[0]) {
-        svg.style.position = 'absolute';
-        svg.style.top = 0;
-        svg.style.left = 0;
-      }
+      svg.style.position = 'absolute';
+      svg.style.top = 0;
+      svg.style.left = 0;
       svg.setAttribute('width', width);
       svg.setAttribute('height', height);
       const offX = (width - (cellCountX * cellSize))/2, offY = (height - (cellCountY * cellSize))/2;
       svg.setAttribute('viewBox', `${0 - offX} ${0 - offY} ${width} ${height}`);
-      svg = container.appendChild(svg);
+      svg = document.getElementsByTagName('body')[0].appendChild(svg);
 
       svg.grid = [];
 
@@ -124,7 +120,7 @@ l = () => {
       return svg;
     }
 
-    const board = makeBoard({container, width, height, cellCountX, cellCountY, initialBoardState});
+    const board = makeBoard({width, height, cellCountX, cellCountY, initialBoardState});
     setInterval(() => { board.iterateState() }, updateTime);
   };
   makeLife({initialBoardState: `........................O
