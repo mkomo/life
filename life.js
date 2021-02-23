@@ -1,6 +1,6 @@
-function life() {
-  if (life.on) return;
-  life.on = true;
+l = () => {
+  if (l.on) return;
+  l.on = true;
   const BOUNDARY_CONDITION_WRAP = 'wrap', BOUNDARY_CONDITION_END = 'end';
   const DEFAULT_UPDATE_TIME = 50; //ms
   const MIN_CELL_SIZE = 10; //px
