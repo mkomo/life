@@ -25,17 +25,16 @@ l = () => {
       d.title = 'life';
 
       const styleCell = (cell, bs, i, j) => {
-        // cell.style.fill = '#000';
         if (bs[j][i] !== cell.value) {
           cell.value = bs[j][i];
           cell[sA]('style', `fill:blue;stroke:pink;stroke-width:1;fill-opacity:0.${bs[j][i] ? 9 : 1};stroke-opacity:0.9;`) //TODO simplify this
         }
       }
       const makeCell = (i,j) => {
-        const cell = d[cENS](NS, 'path'); //Create a path in SVG's namespace
+        const cell = d[cENS](NS, 'path'); //Create a path in board's namespace
         cell[sA]('d',`M ${i*cellSize} ${j*cellSize} `
           + `L ${(i+1)*cellSize} ${j*cellSize} ${(i+1)*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${j*cellSize}`); //Set path's data
-        svg.appendChild(cell);
+        board.appendChild(cell);
         return cell;
       }
 
@@ -85,36 +84,36 @@ l = () => {
         return boardState.map((row, i)=>row.map((c,j) => nextCell(i,j, boardState)));
       }
 
-      //create svg
-      let svg = d[cENS](NS, 'svg'); //Get svg element
-      svg.style.position = 'absolute';
-      svg.style.top = 0;
-      svg.style.left = 0;
-      svg[sA]('width', w);
-      svg[sA]('height', h);
+      //create board
+      let board = d[cENS](NS, 'svg'); //Get board element
+      board.style.position = 'absolute';
+      board.style.top = 0;
+      board.style.left = 0;
+      board[sA]('width', w);
+      board[sA]('height', h);
       const offX = (w - (x * cellSize))/2, offY = (h - (y * cellSize))/2;
-      svg[sA]('viewBox', `${0 - offX} ${0 - offY} ${w} ${h}`);
-      svg = d.getElementsByTagName('body')[0].appendChild(svg);
+      board[sA]('viewBox', `${0 - offX} ${0 - offY} ${w} ${h}`);
+      board = d.getElementsByTagName('body')[0].appendChild(board);
 
-      svg.grid = [];
+      board.grid = [];
 
       for (let i = 0; i < x; i++) {
-        svg.grid.push([]);
+        board.grid.push([]);
         for (let j = 0; j < y; j++) {
-          svg.grid[i].push(makeCell(i,j));
+          board.grid[i].push(makeCell(i,j));
         }
       }
 
       let boardState = bs(ibs);
-      svg.go = () => {
+      board.go = () => {
         boardState = next(boardState);
         for (let i = 0; i < x; i++) {
           for (let j = 0; j < y; j++) {
-            styleCell(svg.grid[i][j], boardState, i, j);
+            styleCell(board.grid[i][j], boardState, i, j);
           }
         }
       }
-      return svg;
+      return board;
     }
 
     const board = makeBoard({w, h, x, y, ibs});
