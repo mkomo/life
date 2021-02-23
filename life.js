@@ -7,10 +7,10 @@ l = () => {
   const makeLife = ({
     width = window.innerWidth,
     height = window.innerHeight,
-    cellCountX,
-    cellCountY,
+    x,
+    y,
     boundaryCondition = BOUNDARY_CONDITION_WRAP,
-    initialBoardState = '',
+    ibs = '',
     documentTitle = 'life',
     updateTime = DEFAULT_UPDATE_TIME
   } = {}) => {
@@ -20,9 +20,9 @@ l = () => {
       width,
       height,
       cellSize = MIN_CELL_SIZE,
-      cellCountX = Math.floor(width / cellSize),
-      cellCountY = Math.floor(height / cellSize),
-      initialBoardState}) => {
+      x = Math.floor(width / cellSize),
+      y = Math.floor(height / cellSize),
+      ibs}) => {
 
       const styleCell = (cell, bs, i, j) => {
         // cell.style.fill = '#000';
@@ -48,19 +48,19 @@ l = () => {
        *  use list of all on cells for iterating to render next generation
        */
 
-      //interpret initialBoardState
+      //interpret ibs
       const bs = (ibsString) => {
-        const maxWidth = Math.min(Math.max(...ibsString.split('\n').map(row => row.length)), cellCountX);
-        const padWidth = Math.floor((cellCountX - maxWidth)/2);
+        const maxWidth = Math.min(Math.max(...ibsString.split('\n').map(row => row.length)), x);
+        const padWidth = Math.floor((x - maxWidth)/2);
 
         const centerY = (a,l, fillVal) => a.length < l
           ? new Array(Math.floor((l - a.length)/2)).fill(fillVal).concat(a, new Array(Math.ceil((l - a.length)/2)).fill(fillVal))
           : a;
-        const centerX = (a, fillVal) => a.length < cellCountX
-          ? new Array(padWidth).fill(fillVal).concat(a, new Array(cellCountX - a.length - padWidth).fill(fillVal))
+        const centerX = (a, fillVal) => a.length < x
+          ? new Array(padWidth).fill(fillVal).concat(a, new Array(x - a.length - padWidth).fill(fillVal))
           : a;
 
-        return centerY(ibsString.split('\n'), cellCountY, '').map(row=>centerX(row.split(''), '.').map(cell => cell === 'O'))
+        return centerY(ibsString.split('\n'), y, '').map(row=>centerX(row.split(''), '.').map(cell => cell === 'O'))
       }
       const inverse = (i, j, boardState) => {
         return !boardState[i][j];
@@ -95,24 +95,24 @@ l = () => {
       svg.style.left = 0;
       svg.setAttribute('width', width);
       svg.setAttribute('height', height);
-      const offX = (width - (cellCountX * cellSize))/2, offY = (height - (cellCountY * cellSize))/2;
+      const offX = (width - (x * cellSize))/2, offY = (height - (y * cellSize))/2;
       svg.setAttribute('viewBox', `${0 - offX} ${0 - offY} ${width} ${height}`);
       svg = document.getElementsByTagName('body')[0].appendChild(svg);
 
       svg.grid = [];
 
-      for (let i = 0; i < cellCountX; i++) {
+      for (let i = 0; i < x; i++) {
         svg.grid.push([]);
-        for (let j = 0; j < cellCountY; j++) {
+        for (let j = 0; j < y; j++) {
           svg.grid[i].push(makeCell(i,j));
         }
       }
 
-      let boardState = bs(initialBoardState);
-      svg.iterateState = () => {
+      let boardState = bs(ibs);
+      svg.go = () => {
         boardState = next(boardState);
-        for (let i = 0; i < cellCountX; i++) {
-          for (let j = 0; j < cellCountY; j++) {
+        for (let i = 0; i < x; i++) {
+          for (let j = 0; j < y; j++) {
             styleCell(svg.grid[i][j], boardState, i, j);
           }
         }
@@ -120,10 +120,10 @@ l = () => {
       return svg;
     }
 
-    const board = makeBoard({width, height, cellCountX, cellCountY, initialBoardState});
-    setInterval(() => { board.iterateState() }, updateTime);
+    const board = makeBoard({width, height, x, y, ibs});
+    setInterval(() => { board.go() }, updateTime);
   };
-  makeLife({initialBoardState: `........................O
+  makeLife({ibs: `........................O
 ......................O.O
 ............OO......OO............OO
 ...........O...O....OO............OO
