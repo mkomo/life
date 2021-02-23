@@ -5,8 +5,8 @@ l = () => {
   const DEFAULT_UPDATE_TIME = 50; //ms
   const MIN_CELL_SIZE = 10; //px
   const makeLife = ({
-    width = window.innerWidth,
-    height = window.innerHeight,
+    w = window.innerWidth,
+    h = window.innerHeight,
     x,
     y,
     boundaryCondition = BOUNDARY_CONDITION_WRAP,
@@ -17,11 +17,11 @@ l = () => {
     document.title = documentTitle;
 
     const makeBoard = ({
-      width,
-      height,
+      w,
+      h,
       cellSize = MIN_CELL_SIZE,
-      x = Math.floor(width / cellSize),
-      y = Math.floor(height / cellSize),
+      x = Math.floor(w / cellSize),
+      y = Math.floor(h / cellSize),
       ibs}) => {
 
       const styleCell = (cell, bs, i, j) => {
@@ -93,10 +93,10 @@ l = () => {
       svg.style.position = 'absolute';
       svg.style.top = 0;
       svg.style.left = 0;
-      svg.setAttribute('width', width);
-      svg.setAttribute('height', height);
-      const offX = (width - (x * cellSize))/2, offY = (height - (y * cellSize))/2;
-      svg.setAttribute('viewBox', `${0 - offX} ${0 - offY} ${width} ${height}`);
+      svg.setAttribute('width', w);
+      svg.setAttribute('height', h);
+      const offX = (w - (x * cellSize))/2, offY = (h - (y * cellSize))/2;
+      svg.setAttribute('viewBox', `${0 - offX} ${0 - offY} ${w} ${h}`);
       svg = document.getElementsByTagName('body')[0].appendChild(svg);
 
       svg.grid = [];
@@ -120,7 +120,7 @@ l = () => {
       return svg;
     }
 
-    const board = makeBoard({width, height, x, y, ibs});
+    const board = makeBoard({w, h, x, y, ibs});
     setInterval(() => { board.go() }, updateTime);
   };
   makeLife({ibs: `........................O
