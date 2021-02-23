@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ "$1" = "help" ]; then
+  echo "$0 [(staged|expanded|freq|help)]"
+elif [ "$1" = "staged" ]; then
+  uglifyjs -e  --compress --mangle --toplevel -- <(git show :life.js)
+elif [ "$1" = "expanded" ]; then
+  uglifyjs -b -- <(uglifyjs -e --compress --mangle --toplevel -- life.js)
+elif [ "$1" = "freq" ]; then
+  uglifyjs -e  --compress --mangle --toplevel -- life.js | sed -e "s/[^a-zA-Z]/ /g"  -e "s/  */ /g" | tr " " "\n" | dtk uc
+else
+  uglifyjs -e  --compress --mangle --toplevel -- life.js
+fi
+
