@@ -11,18 +11,18 @@ l = () => {
     y,
     boundaryCondition = BOUNDARY_CONDITION_WRAP,
     ibs = '',
-    documentTitle = 'life',
-    updateTime = DEFAULT_UPDATE_TIME
+    t = DEFAULT_UPDATE_TIME
   } = {}) => {
-    document.title = documentTitle;
 
-    const makeBoard = ({
+    const d = document, makeBoard = ({
       w,
       h,
       cellSize = MIN_CELL_SIZE,
       x = Math.floor(w / cellSize),
       y = Math.floor(h / cellSize),
       ibs}) => {
+
+      d.title = 'life';
 
       const styleCell = (cell, bs, i, j) => {
         // cell.style.fill = '#000';
@@ -32,7 +32,7 @@ l = () => {
         }
       }
       const makeCell = (i,j) => {
-        const cell = document.createElementNS('http://www.w3.org/2000/svg', 'path'); //Create a path in SVG's namespace
+        const cell = d.createElementNS('http://www.w3.org/2000/svg', 'path'); //Create a path in SVG's namespace
         cell.setAttribute('d',`M ${i*cellSize} ${j*cellSize} `
           + `L ${(i+1)*cellSize} ${j*cellSize} ${(i+1)*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${j*cellSize}`); //Set path's data
         svg.appendChild(cell);
@@ -89,7 +89,7 @@ l = () => {
       }
 
       //create svg
-      let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); //Get svg element
+      let svg = d.createElementNS('http://www.w3.org/2000/svg', 'svg'); //Get svg element
       svg.style.position = 'absolute';
       svg.style.top = 0;
       svg.style.left = 0;
@@ -97,7 +97,7 @@ l = () => {
       svg.setAttribute('height', h);
       const offX = (w - (x * cellSize))/2, offY = (h - (y * cellSize))/2;
       svg.setAttribute('viewBox', `${0 - offX} ${0 - offY} ${w} ${h}`);
-      svg = document.getElementsByTagName('body')[0].appendChild(svg);
+      svg = d.getElementsByTagName('body')[0].appendChild(svg);
 
       svg.grid = [];
 
@@ -121,7 +121,7 @@ l = () => {
     }
 
     const board = makeBoard({w, h, x, y, ibs});
-    setInterval(() => { board.go() }, updateTime);
+    setInterval(() => { board.go() }, t);
   };
   makeLife({ibs: `........................O
 ......................O.O
