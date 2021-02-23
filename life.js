@@ -14,12 +14,12 @@ l = () => {
     t = DEFAULT_UPDATE_TIME
   } = {}) => {
 
-    const d = document, makeBoard = ({
+    const d = document, M = Math, sA = 'setAttribute', makeBoard = ({
       w,
       h,
       cellSize = MIN_CELL_SIZE,
-      x = Math.floor(w / cellSize),
-      y = Math.floor(h / cellSize),
+      x = M.floor(w / cellSize),
+      y = M.floor(h / cellSize),
       ibs}) => {
 
       d.title = 'life';
@@ -28,12 +28,12 @@ l = () => {
         // cell.style.fill = '#000';
         if (bs[j][i] !== cell.value) {
           cell.value = bs[j][i];
-          cell.setAttribute('style', `fill:blue;stroke:pink;stroke-width:1;fill-opacity:0.${bs[j][i] ? 9 : 1};stroke-opacity:0.9;`) //TODO simplify this
+          cell[sA]('style', `fill:blue;stroke:pink;stroke-width:1;fill-opacity:0.${bs[j][i] ? 9 : 1};stroke-opacity:0.9;`) //TODO simplify this
         }
       }
       const makeCell = (i,j) => {
         const cell = d.createElementNS('http://www.w3.org/2000/svg', 'path'); //Create a path in SVG's namespace
-        cell.setAttribute('d',`M ${i*cellSize} ${j*cellSize} `
+        cell[sA]('d',`M ${i*cellSize} ${j*cellSize} `
           + `L ${(i+1)*cellSize} ${j*cellSize} ${(i+1)*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${j*cellSize}`); //Set path's data
         svg.appendChild(cell);
         return cell;
@@ -50,11 +50,11 @@ l = () => {
 
       //interpret ibs
       const bs = (ibsString) => {
-        const maxWidth = Math.min(Math.max(...ibsString.split('\n').map(row => row.length)), x);
-        const padWidth = Math.floor((x - maxWidth)/2);
+        const maxWidth = M.min(M.max(...ibsString.split('\n').map(row => row.length)), x);
+        const padWidth = M.floor((x - maxWidth)/2);
 
         const centerY = (a,l, fillVal) => a.length < l
-          ? new Array(Math.floor((l - a.length)/2)).fill(fillVal).concat(a, new Array(Math.ceil((l - a.length)/2)).fill(fillVal))
+          ? new Array(M.floor((l - a.length)/2)).fill(fillVal).concat(a, new Array(M.ceil((l - a.length)/2)).fill(fillVal))
           : a;
         const centerX = (a, fillVal) => a.length < x
           ? new Array(padWidth).fill(fillVal).concat(a, new Array(x - a.length - padWidth).fill(fillVal))
@@ -93,10 +93,10 @@ l = () => {
       svg.style.position = 'absolute';
       svg.style.top = 0;
       svg.style.left = 0;
-      svg.setAttribute('width', w);
-      svg.setAttribute('height', h);
+      svg[sA]('width', w);
+      svg[sA]('height', h);
       const offX = (w - (x * cellSize))/2, offY = (h - (y * cellSize))/2;
-      svg.setAttribute('viewBox', `${0 - offX} ${0 - offY} ${w} ${h}`);
+      svg[sA]('viewBox', `${0 - offX} ${0 - offY} ${w} ${h}`);
       svg = d.getElementsByTagName('body')[0].appendChild(svg);
 
       svg.grid = [];

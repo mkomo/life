@@ -8,6 +8,8 @@ elif [ "$1" = "expanded" ]; then
   uglifyjs -b -- <(uglifyjs -e --compress --mangle --toplevel -- life.js)
 elif [ "$1" = "freq" ]; then
   uglifyjs -e  --compress --mangle --toplevel -- life.js | sed -e "s/[^a-zA-Z]/ /g"  -e "s/  */ /g" | tr " " "\n" | dtk uc
+elif [ "$1" = "wc" ]; then
+  uglifyjs -e  --compress --mangle --toplevel -- life.js | wc
 else
   uglifyjs -e  --compress --mangle --toplevel -- life.js
 fi
