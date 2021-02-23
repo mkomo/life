@@ -62,9 +62,6 @@ l = () => {
 
         return centerY(ibsString.split('\n'), y, '').map(row=>centerX(row.split(''), '.').map(cell => cell === 'O'))
       }
-      const inverse = (i, j, boardState) => {
-        return !boardState[i][j];
-      }
 
       const conway = (i, j, boardState) => {
         // rules https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
