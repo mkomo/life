@@ -1,7 +1,7 @@
 l = () => {
   if (l.on) return;
-  l.on = true;
-  const BOUNDARY_CONDITION_WRAP = 'wrap', BOUNDARY_CONDITION_END = 'end';
+  l.on = 1;
+  const BOUNDARY_CONDITION_WRAP = 'wrap';
   const DEFAULT_UPDATE_TIME = 50; //ms
   const MIN_CELL_SIZE = 10; //px
   const w = window.innerWidth,
@@ -27,96 +27,96 @@ OO........O...O.OO....O.O
     x = M.floor(w / cellSize),
     y = M.floor(h / cellSize);
 
-    d.title = 'life';
+  d.title = 'life';
 
-    const styleCell = (cell, bs, i, j) => {
-      if (bs[j][i] !== cell.value) {
-        cell.value = bs[j][i];
-        cell[sA]('style', `fill:blue;stroke:pink;stroke-width:1;fill-opacity:0.${bs[j][i] ? 9 : 1};stroke-opacity:0.9;`) //TODO simplify this
-      }
+  const styleCellSvg = (cell, bs, i, j) => {
+    if (bs[j][i] !== cell.value) {
+      cell.value = bs[j][i];
+      cell[sA]('style', `fill:blue;stroke:pink;stroke-width:1;fill-opacity:0.${bs[j][i] ? 9 : 1};stroke-opacity:0.9;`) //TODO simplify this
     }
-    const makeCell = (i,j) => {
-      const cell = d[cENS](NS, 'path'); //Create a path in board's namespace
-      cell[sA]('d',`M ${i*cellSize} ${j*cellSize} `
-        + `L ${(i+1)*cellSize} ${j*cellSize} ${(i+1)*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${j*cellSize}`); //Set path's data
-      board.appendChild(cell);
-      return cell;
+  }
+  const makeCellSvg = (i,j) => {
+    const cell = d[cENS](NS, 'path'); //Create a path in board's namespace
+    cell[sA]('d',`M ${i*cellSize} ${j*cellSize} `
+      + `L ${(i+1)*cellSize} ${j*cellSize} ${(i+1)*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${j*cellSize}`); //Set path's data
+    board.appendChild(cell);
+    return cell;
+  }
+
+  //TODO redraw on resize?
+  //TODO handle user interactions? minimally: spacebar or longpress for pause/resume, click/tap to change value
+  //TODO keep track of golfing and performance
+  //TODO prevent laggy-ness
+  /**
+   * efficiency improvements:
+   *  use list of all on cells for iterating to render next generation
+   */
+
+  //create board
+  const board =
+    d[cENS](NS, 'svg'); //svg board creation
+  board.style.position = 'absolute';
+  board.style.top = 0;
+  board.style.left = 0;
+  board[sA]('width', w);
+  board[sA]('height', h);
+  const offX = (w - (x * cellSize))/2,
+    offY = (h - (y * cellSize))/2;
+  board[sA]('viewBox', `${0 - offX} ${0 - offY} ${w} ${h}`);
+  d.getElementsByTagName('body')[0].appendChild(board);
+
+  board.grid = [];
+  for (let i = 0; i < x; i++) {
+    board.grid.push([]);
+    for (let j = 0; j < y; j++) {
+      board.grid[i].push(makeCellSvg(i,j));
     }
+  }
 
-    //TODO redraw on resize?
-    //TODO handle user interactions? minimally: spacebar or longpress for pause/resume, click/tap to change value
-    //TODO keep track of golfing and performance
-    //TODO prevent laggy-ness
-    /**
-     * efficiency improvements:
-     *  use list of all on cells for iterating to render next generation
-     */
+  //interpret ibs
+  const bs = (ibsString) => {
+    const maxWidth = M.min(M.max(...ibsString.split('\n').map(row => row.length)), x);
+    const padWidth = M.floor((x - maxWidth)/2);
 
-    //interpret ibs
-    const bs = (ibsString) => {
-      const maxWidth = M.min(M.max(...ibsString.split('\n').map(row => row.length)), x);
-      const padWidth = M.floor((x - maxWidth)/2);
+    const centerY = (a,l, fillVal) => a.length < l
+      ? new A(M.floor((l - a.length)/2)).fill(fillVal).concat(a, new A(M.ceil((l - a.length)/2)).fill(fillVal))
+      : a;
+    const centerX = (a, fillVal) => a.length < x
+      ? new A(padWidth).fill(fillVal).concat(a, new A(x - a.length - padWidth).fill(fillVal))
+      : a;
 
-      const centerY = (a,l, fillVal) => a.length < l
-        ? new A(M.floor((l - a.length)/2)).fill(fillVal).concat(a, new A(M.ceil((l - a.length)/2)).fill(fillVal))
-        : a;
-      const centerX = (a, fillVal) => a.length < x
-        ? new A(padWidth).fill(fillVal).concat(a, new A(x - a.length - padWidth).fill(fillVal))
-        : a;
+    return centerY(ibsString.split('\n'), y, '').map(row=>centerX(row.split(''), '.').map(cell => cell === 'O'))
+  }
 
-      return centerY(ibsString.split('\n'), y, '').map(row=>centerX(row.split(''), '.').map(cell => cell === 'O'))
-    }
+  const conway = (i, j, boardState) => {
+    // rules https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
+    const live = boardState[i][j];
+    const rowBefore = i == 0 ? boardState.length - 1 : i-1,
+      colBefore = j == 0 ? boardState[0].length - 1 : j-1,
+      rowAfter = i == boardState.length - 1 ? 0 : i+1,
+      colAfter = j == boardState[0].length - 1 ? 0 : j+1;
+    let liveNeighborCount = [
+      boardState[rowBefore][colBefore], boardState[rowBefore][j], boardState[rowBefore][colAfter],
+      boardState[i][colBefore]        ,                           boardState[i][colAfter],
+      boardState[rowAfter][colBefore] , boardState[rowAfter][j] , boardState[rowAfter][colAfter]
+    ].map(v => v ? 1 : 0).reduce((accumulator, currentValue) => accumulator + currentValue);
+    return live
+      ? (liveNeighborCount === 2 || liveNeighborCount === 3)
+      : liveNeighborCount === 3;
+  }
 
-    const conway = (i, j, boardState) => {
-      // rules https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
-      const live = boardState[i][j];
-      const rowBefore = i == 0 ? boardState.length - 1 : i-1,
-        colBefore = j == 0 ? boardState[0].length - 1 : j-1,
-        rowAfter = i == boardState.length - 1 ? 0 : i+1,
-        colAfter = j == boardState[0].length - 1 ? 0 : j+1;
-      let liveNeighborCount = [
-        boardState[rowBefore][colBefore], boardState[rowBefore][j], boardState[rowBefore][colAfter],
-        boardState[i][colBefore]        ,                           boardState[i][colAfter],
-        boardState[rowAfter][colBefore] , boardState[rowAfter][j] , boardState[rowAfter][colAfter]
-      ].map(v => v ? 1 : 0).reduce((accumulator, currentValue) => accumulator + currentValue);
-      return live
-        ? (liveNeighborCount === 2 || liveNeighborCount === 3)
-        : liveNeighborCount === 3;
-    }
+  const next = boardState => {
+    return boardState.map((row, i)=>row.map((c,j) => conway(i,j, boardState)));
+  }
+  let boardState = bs(ibs);
 
-    const nextCell = conway;
-    const next = boardState => {
-      return boardState.map((row, i)=>row.map((c,j) => nextCell(i,j, boardState)));
-    }
-
-    //create board
-    let board = d[cENS](NS, 'svg'); //Get board element
-    board.style.position = 'absolute';
-    board.style.top = 0;
-    board.style.left = 0;
-    board[sA]('width', w);
-    board[sA]('height', h);
-    const offX = (w - (x * cellSize))/2, offY = (h - (y * cellSize))/2;
-    board[sA]('viewBox', `${0 - offX} ${0 - offY} ${w} ${h}`);
-    board = d.getElementsByTagName('body')[0].appendChild(board);
-
-    board.grid = [];
-
-    let boardState = bs(ibs);
+  board.go = () => {
+    boardState = next(boardState);
     for (let i = 0; i < x; i++) {
-      board.grid.push([]);
       for (let j = 0; j < y; j++) {
-        board.grid[i].push(makeCell(i,j));
+        styleCellSvg(board.grid[i][j], boardState, i, j);
       }
     }
-
-    board.go = () => {
-      boardState = next(boardState);
-      for (let i = 0; i < x; i++) {
-        for (let j = 0; j < y; j++) {
-          styleCell(board.grid[i][j], boardState, i, j);
-        }
-      }
-    }
-    setInterval(() => { board.go() }, t);
+  }
+  setInterval(() => { board.go() }, t);
 };
