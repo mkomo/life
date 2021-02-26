@@ -29,20 +29,6 @@ OO........O...O.OO....O.O
 
   d.title = 'life';
 
-  const styleCellSvg = (cell, bs, i, j) => {
-    if (bs[j][i] !== cell.value) {
-      cell.value = bs[j][i];
-      cell[sA]('style', `fill:blue;stroke:pink;stroke-width:1;fill-opacity:0.${bs[j][i] ? 9 : 1};stroke-opacity:0.9;`) //TODO simplify this
-    }
-  }
-  const makeCellSvg = (i,j) => {
-    const cell = d[cENS](NS, 'path'); //Create a path in board's namespace
-    cell[sA]('d',`M ${i*cellSize} ${j*cellSize} `
-      + `L ${(i+1)*cellSize} ${j*cellSize} ${(i+1)*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${j*cellSize}`); //Set path's data
-    board.appendChild(cell);
-    return cell;
-  }
-
   //TODO redraw on resize?
   //TODO handle user interactions? minimally: spacebar or longpress for pause/resume, click/tap to change value
   //TODO keep track of golfing and performance
@@ -55,21 +41,32 @@ OO........O...O.OO....O.O
   //create board
   const makeBoardSvg = () => {
     const board =
-      d[cENS](NS, 'svg'); //svg board creation
+      d[cENS](NS, 'svg'), 
+      offX = (w - (x * cellSize))/2,
+      offY = (h - (y * cellSize))/2,
+      grid = [];
     board.style.position = 'absolute';
     board.style.top = 0;
     board.style.left = 0;
     board[sA]('width', w);
     board[sA]('height', h);
-    const offX = (w - (x * cellSize))/2,
-      offY = (h - (y * cellSize))/2;
     board[sA]('viewBox', `${0 - offX} ${0 - offY} ${w} ${h}`);
     d.getElementsByTagName('body')[0].appendChild(board);
-    board.grid = [];
     for (let i = 0; i < x; i++) {
-      board.grid.push([]);
+      grid.push([]);
       for (let j = 0; j < y; j++) {
-        board.grid[i].push(makeCellSvg(i,j));
+        const cell = d[cENS](NS, 'path'); //Create a path in board's namespace
+        cell[sA]('d',`M ${i*cellSize} ${j*cellSize} `
+          + `L ${(i+1)*cellSize} ${j*cellSize} ${(i+1)*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${j*cellSize}`); //Set path's data
+        board.appendChild(cell);
+        grid[i].push(cell);
+      }
+    }
+    board.n = (i, j, value) => {
+      const cell = grid[i][j];
+      if (value !== cell.value) {
+        cell.value = value;
+        cell[sA]('style', `fill:blue;stroke:pink;stroke-width:1;fill-opacity:0.${value ? 9 : 1};stroke-opacity:0.9;`) //TODO simplify this
       }
     }
     return board;
@@ -118,7 +115,7 @@ OO........O...O.OO....O.O
     boardState = next(boardState);
     for (let i = 0; i < x; i++) {
       for (let j = 0; j < y; j++) {
-        styleCellSvg(board.grid[i][j], boardState, i, j);
+        board.n(i, j, boardState[j][i]);
       }
     }
   }
