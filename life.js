@@ -53,25 +53,29 @@ OO........O...O.OO....O.O
    */
 
   //create board
-  const board =
-    d[cENS](NS, 'svg'); //svg board creation
-  board.style.position = 'absolute';
-  board.style.top = 0;
-  board.style.left = 0;
-  board[sA]('width', w);
-  board[sA]('height', h);
-  const offX = (w - (x * cellSize))/2,
-    offY = (h - (y * cellSize))/2;
-  board[sA]('viewBox', `${0 - offX} ${0 - offY} ${w} ${h}`);
-  d.getElementsByTagName('body')[0].appendChild(board);
-
-  board.grid = [];
-  for (let i = 0; i < x; i++) {
-    board.grid.push([]);
-    for (let j = 0; j < y; j++) {
-      board.grid[i].push(makeCellSvg(i,j));
+  const makeBoardSvg = () => {
+    const board =
+      d[cENS](NS, 'svg'); //svg board creation
+    board.style.position = 'absolute';
+    board.style.top = 0;
+    board.style.left = 0;
+    board[sA]('width', w);
+    board[sA]('height', h);
+    const offX = (w - (x * cellSize))/2,
+      offY = (h - (y * cellSize))/2;
+    board[sA]('viewBox', `${0 - offX} ${0 - offY} ${w} ${h}`);
+    d.getElementsByTagName('body')[0].appendChild(board);
+    board.grid = [];
+    for (let i = 0; i < x; i++) {
+      board.grid.push([]);
+      for (let j = 0; j < y; j++) {
+        board.grid[i].push(makeCellSvg(i,j));
+      }
     }
+    return board;
   }
+
+  const board = makeBoardSvg();
 
   //interpret ibs
   const bs = (ibsString) => {
