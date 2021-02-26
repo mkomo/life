@@ -50,13 +50,13 @@ OO........O...O.OO....O.O
     board[sA]('width', w);
     board[sA]('height', h);
     board[sA]('viewBox', `${0 - offX} ${0 - offY} ${w} ${h}`);
-    d.getElementsByTagName('body')[0].appendChild(board);
+    d.body.appendChild(board);
     for (let i = 0; i < x; i++) {
       grid.push([]);
       for (let j = 0; j < y; j++) {
-        const cell = d[cENS](NS, 'path'); //Create a path in board's namespace
+        const cell = d[cENS](NS, 'path');
         cell[sA]('d',`M ${i*cellSize} ${j*cellSize} `
-          + `L ${(i+1)*cellSize} ${j*cellSize} ${(i+1)*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${j*cellSize}`); //Set path's data
+          + `L ${(i+1)*cellSize} ${j*cellSize} ${(i+1)*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${(j+1)*cellSize} ${i*cellSize} ${j*cellSize}`);
         board.appendChild(cell);
         grid[i].push(cell);
       }
@@ -65,9 +65,35 @@ OO........O...O.OO....O.O
       const cell = grid[i][j];
       if (value !== cell.value) {
         cell.value = value;
-        cell[sA]('style', `fill:blue;stroke:pink;stroke-width:1;fill-opacity:0.${value ? 9 : 1};stroke-opacity:0.9;`) //TODO simplify this
+        cell[sA]('style', `fill:#09c;stroke:#03c;stroke-width:1;fill-opacity:0.${value ? 9 : 1};stroke-opacity:0.9;`) //TODO simplify this
       }
     }
+    return board;
+  }
+
+  const makeBoardCanvas = () => {
+    const sA = 'setAttribute',
+      board = d.createElement('canvas'),
+      ctx = board.getContext('2d'),
+      grid = Array(y).fill().map(() => Array(x));
+
+    board.style.position = 'fixed';
+    board.style.top = (h - (y * cellSize))/2 + 'px';
+    board.style.left = (w - (x * cellSize))/2 + 'px';
+    board[sA]('width', w);
+    board[sA]('height', h);
+
+    // TODO draw grid
+
+    board.go = (i, j, value) => {
+      if (value !== grid[i][j]) {
+        grid[i][j] = value;
+        ctx.fillStyle = `rgba(0,48,192,0.${value ? 9 : 1})`;
+        ctx.clearRect(i*cellSize, j*cellSize, cellSize, cellSize);
+        ctx.fillRect(i*cellSize, j*cellSize, cellSize, cellSize);
+      }
+    }
+    d.body.appendChild(board);
     return board;
   }
 
@@ -98,14 +124,16 @@ OO........O...O.OO....O.O
       boardState[rowBefore][colBefore], boardState[rowBefore][j], boardState[rowBefore][colAfter],
       boardState[i][colBefore]        ,                           boardState[i][colAfter],
       boardState[rowAfter][colBefore] , boardState[rowAfter][j] , boardState[rowAfter][colAfter]
-    ].map(v => v ? 1 : 0).reduce((accumulator, currentValue) => accumulator + currentValue);
+    ].map(v => v ? 1 : 0).reduce((acc, val) => acc + val);
     return live
       ? (liveNeighborCount === 2 || liveNeighborCount === 3)
       : liveNeighborCount === 3;
   }
 
   // set up the board and the board state
-  let board = makeBoardSvg(), boardState = interpretBoardString(ibs);
+  // let board = location.search ? makeBoardSvg() : makeBoardCanvas(), boardState = interpretBoardString(ibs);
+  let board = makeBoardCanvas(), boardState = interpretBoardString(ibs);
+  // let board = makeBoardSvg(), boardState = interpretBoardString(ibs);
 
   // run the animation
   setInterval(() => {
