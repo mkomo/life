@@ -20,9 +20,6 @@ OO........O...O.OO....O.O
     d = document,
     M = Math,
     A = Array,
-    cENS = 'createElementNS',
-    sA = 'setAttribute',
-    NS = 'http://www.w3.org/2000/svg',
     cellSize = MIN_CELL_SIZE,
     x = M.floor(w / cellSize),
     y = M.floor(h / cellSize);
@@ -40,7 +37,10 @@ OO........O...O.OO....O.O
 
   //create board
   const makeBoardSvg = () => {
-    const board =
+    const cENS = 'createElementNS',
+      sA = 'setAttribute',
+      NS = 'http://www.w3.org/2000/svg',
+      board =
       d[cENS](NS, 'svg'), 
       offX = (w - (x * cellSize))/2,
       offY = (h - (y * cellSize))/2,
@@ -62,7 +62,7 @@ OO........O...O.OO....O.O
         grid[i].push(cell);
       }
     }
-    board.n = (i, j, value) => {
+    board.go = (i, j, value) => {
       const cell = grid[i][j];
       if (value !== cell.value) {
         cell.value = value;
@@ -72,10 +72,8 @@ OO........O...O.OO....O.O
     return board;
   }
 
-  const board = makeBoardSvg();
-
-  //interpret ibs
-  const bs = (ibsString) => {
+  //interpret initial board state
+  const interpretBoardString = (ibsString) => {
     const maxWidth = M.min(M.max(...ibsString.split('\n').map(row => row.length)), x);
     const padWidth = M.floor((x - maxWidth)/2);
 
@@ -89,6 +87,7 @@ OO........O...O.OO....O.O
     return centerY(ibsString.split('\n'), y, '').map(row=>centerX(row.split(''), '.').map(cell => cell === 'O'))
   }
 
+  // define conway rules
   const conway = (i, j, boardState) => {
     // rules https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
     const live = boardState[i][j];
@@ -106,18 +105,16 @@ OO........O...O.OO....O.O
       : liveNeighborCount === 3;
   }
 
-  const next = boardState => {
-    return boardState.map((row, i)=>row.map((c,j) => conway(i,j, boardState)));
-  }
-  let boardState = bs(ibs);
+  // set up the board and the board state
+  let board = makeBoardSvg(), boardState = interpretBoardString(ibs);
 
-  board.go = () => {
-    boardState = next(boardState);
+  // run the animation
+  setInterval(() => {
+    boardState = boardState.map((row, i)=>row.map((c,j) => conway(i,j, boardState)));;
     for (let i = 0; i < x; i++) {
       for (let j = 0; j < y; j++) {
-        board.n(i, j, boardState[j][i]);
+        board.go(i, j, boardState[j][i]);
       }
     }
-  }
-  setInterval(() => { board.go() }, t);
+  }, t);
 };
