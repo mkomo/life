@@ -110,7 +110,7 @@ OO........O...O.OO....O.O
       ? new A(padWidth).fill(fillVal).concat(a, new A(x - len(a) - padWidth).fill(fillVal))
       : a;
 
-    return centerY(ibsString.split('\n'), '').map(row=>centerX(row.split(''), '.').map(cell => cell === 'O'))
+    return centerY(ibsString.split('\n'), '').map(row=>centerX(row.split(''), '.').map(cell => cell == 'O'))
   }
 
   // define conway rules
@@ -121,14 +121,14 @@ OO........O...O.OO....O.O
       colBefore = (j + x - 1) % x,
       rowAfter = (i + 1) % y,
       colAfter = (j + 1) % x;
-    let liveNeighborCount = [
+    let liveNeighborCount = len([
       boardState[rowBefore][colBefore], boardState[rowBefore][j], boardState[rowBefore][colAfter],
       boardState[i][colBefore]        ,                           boardState[i][colAfter],
       boardState[rowAfter][colBefore] , boardState[rowAfter][j] , boardState[rowAfter][colAfter]
-    ].map(v => v ? 1 : 0).reduce((acc, val) => acc + val);
+    ].filter(v=>v));
     return live
-      ? (liveNeighborCount === 2 || liveNeighborCount === 3)
-      : liveNeighborCount === 3;
+      ? (liveNeighborCount == 2 || liveNeighborCount == 3)
+      : liveNeighborCount == 3;
   }
 
   // set up the board and the board state
