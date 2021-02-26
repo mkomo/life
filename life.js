@@ -20,9 +20,10 @@ OO........O...O.OO....O.O
     d = document,
     M = Math,
     A = Array,
+    len = b => b.length,
     cellSize = MIN_CELL_SIZE,
-    x = M.floor(w / cellSize),
-    y = M.floor(h / cellSize);
+    x = ~~(w / cellSize),
+    y = ~~(h / cellSize);
 
   d.title = 'life';
 
@@ -75,7 +76,7 @@ OO........O...O.OO....O.O
     const sA = 'setAttribute',
       board = d.createElement('canvas'),
       ctx = board.getContext('2d'),
-      grid = Array(y).fill().map(() => Array(x));
+      grid = A(y).fill().map(() => A(x));
 
     board.style.position = 'fixed';
     board.style.top = (h - (y * cellSize))/2 + 'px';
@@ -99,27 +100,27 @@ OO........O...O.OO....O.O
 
   //interpret initial board state
   const interpretBoardString = (ibsString) => {
-    const maxWidth = M.min(M.max(...ibsString.split('\n').map(row => row.length)), x);
-    const padWidth = M.floor((x - maxWidth)/2);
+    const maxWidth = M.min(M.max(...ibsString.split('\n').map(len)), x);
+    const padWidth = ~~((x - maxWidth)/2);
 
-    const centerY = (a,l, fillVal) => a.length < l
-      ? new A(M.floor((l - a.length)/2)).fill(fillVal).concat(a, new A(M.ceil((l - a.length)/2)).fill(fillVal))
+    const centerY = (a, fillVal) => len(a) < y
+      ? new A(~~((y - len(a))/2)).fill(fillVal).concat(a, new A(M.ceil((y - len(a))/2)).fill(fillVal))
       : a;
-    const centerX = (a, fillVal) => a.length < x
-      ? new A(padWidth).fill(fillVal).concat(a, new A(x - a.length - padWidth).fill(fillVal))
+    const centerX = (a, fillVal) => len(a) < x
+      ? new A(padWidth).fill(fillVal).concat(a, new A(x - len(a) - padWidth).fill(fillVal))
       : a;
 
-    return centerY(ibsString.split('\n'), y, '').map(row=>centerX(row.split(''), '.').map(cell => cell === 'O'))
+    return centerY(ibsString.split('\n'), '').map(row=>centerX(row.split(''), '.').map(cell => cell === 'O'))
   }
 
   // define conway rules
   const conway = (i, j, boardState) => {
     // rules https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
     const live = boardState[i][j];
-    const rowBefore = i == 0 ? boardState.length - 1 : i-1,
-      colBefore = j == 0 ? boardState[0].length - 1 : j-1,
-      rowAfter = i == boardState.length - 1 ? 0 : i+1,
-      colAfter = j == boardState[0].length - 1 ? 0 : j+1;
+    const rowBefore = (i + y - 1) % y,
+      colBefore = (j + x - 1) % x,
+      rowAfter = (i + 1) % y,
+      colAfter = (j + 1) % x;
     let liveNeighborCount = [
       boardState[rowBefore][colBefore], boardState[rowBefore][j], boardState[rowBefore][colAfter],
       boardState[i][colBefore]        ,                           boardState[i][colAfter],
