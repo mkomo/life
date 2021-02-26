@@ -40,12 +40,11 @@ OO........O...O.OO....O.O
     const cENS = 'createElementNS',
       sA = 'setAttribute',
       NS = 'http://www.w3.org/2000/svg',
-      board =
-      d[cENS](NS, 'svg'), 
+      board = d[cENS](NS, 'svg'),
       offX = (w - (x * cellSize))/2,
       offY = (h - (y * cellSize))/2,
       grid = [];
-    board.style.position = 'absolute';
+    board.style.position = 'fixed';
     board.style.top = 0;
     board.style.left = 0;
     board[sA]('width', w);
