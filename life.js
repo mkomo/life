@@ -100,17 +100,16 @@ OO........O...O.OO....O.O
 
   //interpret initial board state
   const interpretBoardString = (ibsString) => {
-    const maxWidth = M.min(M.max(...ibsString.split('\n').map(len)), x);
-    const padWidth = ~~((x - maxWidth)/2);
+    const maxWidth = M.min(M.max(...ibsString.split('\n').map(len)), x),
+      padWidth = ~~((x - maxWidth)/2),
+      centerY = (a) => len(a) < y
+        ? new A(~~((y - len(a))/2)).fill('').concat(a, new A(M.ceil((y - len(a))/2)).fill(''))
+        : a,
+      centerX = (a) => len(a) < x
+        ? new A(padWidth).fill('.').concat(a, new A(x - len(a) - padWidth).fill('.'))
+        : a;
 
-    const centerY = (a, fillVal) => len(a) < y
-      ? new A(~~((y - len(a))/2)).fill(fillVal).concat(a, new A(M.ceil((y - len(a))/2)).fill(fillVal))
-      : a;
-    const centerX = (a, fillVal) => len(a) < x
-      ? new A(padWidth).fill(fillVal).concat(a, new A(x - len(a) - padWidth).fill(fillVal))
-      : a;
-
-    return centerY(ibsString.split('\n'), '').map(row=>centerX(row.split(''), '.').map(cell => cell == 'O'))
+    return centerY(ibsString.split('\n')).map(row=>centerX(row.split('')).map(cell => cell == 'O'))
   }
 
   // define conway rules
