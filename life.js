@@ -2,7 +2,7 @@ l = () => {
   if (l.on) return;
   l.on = 1;
   const BOUNDARY_CONDITION_WRAP = 'wrap';
-  const DEFAULT_UPDATE_TIME = 50; //ms
+  const DEFAULT_UPDATE_TIME = 30; //ms
   const MIN_CELL_SIZE = 10; //px
   const w = window.innerWidth,
     h = window.innerHeight,
@@ -87,8 +87,8 @@ OO........O...O.OO....O.O
     // TODO draw grid
 
     board.go = (i, j, value) => {
-      if (value !== grid[i][j]) {
-        grid[i][j] = value;
+      if (value !== grid[j][i]) {
+        grid[j][i] = value;
         ctx.fillStyle = `rgba(0,48,192,0.${value ? 9 : 1})`;
         ctx.clearRect(i*cellSize, j*cellSize, cellSize, cellSize);
         ctx.fillRect(i*cellSize, j*cellSize, cellSize, cellSize);
@@ -108,7 +108,6 @@ OO........O...O.OO....O.O
       centerX = (a) => len(a) < x
         ? new A(padWidth).fill('.').concat(a, new A(x - len(a) - padWidth).fill('.'))
         : a;
-
     return centerY(ibsString.split('\n')).map(row=>centerX(row.split('')).map(cell => cell == 'O'))
   }
 
