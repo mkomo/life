@@ -4,8 +4,9 @@ l = () => {
   const BOUNDARY_CONDITION_WRAP = 'wrap';
   const DEFAULT_UPDATE_TIME = 30; //ms
   const MIN_CELL_SIZE = 10; //px
-  const w = window.innerWidth,
-    h = window.innerHeight,
+  let win = window,
+    w = win.innerWidth,
+    h = win.innerHeight,
     boundaryCondition = BOUNDARY_CONDITION_WRAP,
     ibs = `........................O
 ......................O.O
@@ -42,12 +43,13 @@ OO........O...O.OO....O.O
       sA = 'setAttribute',
       NS = 'http://www.w3.org/2000/svg',
       board = d[cENS](NS, 'svg'),
+      bs = board.style,
       offX = (w - (x * cellSize))/2,
       offY = (h - (y * cellSize))/2,
       grid = [];
-    board.style.position = 'fixed';
-    board.style.top = 0;
-    board.style.left = 0;
+    bs.position = 'fixed';
+    bs.top = 0;
+    bs.left = 0;
     board[sA]('width', w);
     board[sA]('height', h);
     board[sA]('viewBox', `${0 - offX} ${0 - offY} ${w} ${h}`);
@@ -73,14 +75,15 @@ OO........O...O.OO....O.O
   }
 
   const makeBoardCanvas = () => {
-    const sA = 'setAttribute',
+    let sA = 'setAttribute',
       board = d.createElement('canvas'),
+      bs = board.style,
       ctx = board.getContext('2d'),
       grid = A(y).fill().map(() => A(x));
 
-    board.style.position = 'fixed';
-    board.style.top = (h - (y * cellSize))/2 + 'px';
-    board.style.left = (w - (x * cellSize))/2 + 'px';
+    bs.position = 'fixed';
+    bs.top = (h - (y * cellSize))/2 + 'px';
+    bs.left = (w - (x * cellSize))/2 + 'px';
     board[sA]('width', w);
     board[sA]('height', h);
 
@@ -92,10 +95,10 @@ OO........O...O.OO....O.O
         ctx.fillStyle = `rgba(0,48,192,0.${value ? 9 : 1})`;
         ctx.clearRect(i*cellSize, j*cellSize, cellSize, cellSize);
         ctx.fillRect(i*cellSize, j*cellSize, cellSize, cellSize);
+
       }
     }
-    d.body.appendChild(board);
-    return board;
+    return d.body.appendChild(board);
   }
 
   //interpret initial board state
@@ -103,18 +106,17 @@ OO........O...O.OO....O.O
     const maxWidth = M.min(M.max(...ibsString.split('\n').map(len)), x),
       padWidth = ~~((x - maxWidth)/2),
       centerY = (a) => len(a) < y
-        ? new A(~~((y - len(a))/2)).fill('').concat(a, new A(M.ceil((y - len(a))/2)).fill(''))
+        ? A(~~((y - len(a))/2)).fill('').concat(a, A(M.ceil((y - len(a))/2)).fill(''))
         : a,
       centerX = (a) => len(a) < x
-        ? new A(padWidth).fill('.').concat(a, new A(x - len(a) - padWidth).fill('.'))
+        ? A(padWidth).fill('.').concat(a, A(x - len(a) - padWidth).fill('.'))
         : a;
     return centerY(ibsString.split('\n')).map(row=>centerX(row.split('')).map(cell => cell == 'O'))
   }
 
   // define conway rules
-  const conway = (i, j, boardState) => {
+  const conway = (i, j, boardState, live) => {
     // rules https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
-    const live = boardState[i][j];
     const rowBefore = (i + y - 1) % y,
       colBefore = (j + x - 1) % x,
       rowAfter = (i + 1) % y,
@@ -136,11 +138,7 @@ OO........O...O.OO....O.O
 
   // run the animation
   setInterval(() => {
-    boardState = boardState.map((row, i)=>row.map((c,j) => conway(i,j, boardState)));;
-    for (let i = 0; i < x; i++) {
-      for (let j = 0; j < y; j++) {
-        board.go(i, j, boardState[j][i]);
-      }
-    }
+    boardState = boardState.map((row, i)=>row.map((live,j) => conway(i,j, boardState, live)));
+    boardState.map((row, i)=>row.map((c,j) => board.go(j,i,c)));
   }, t);
 };
