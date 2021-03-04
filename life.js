@@ -99,9 +99,9 @@ OO.....OO........................
 
   const makeBoardCanvas = () => {
     let sA = 'setAttribute',
-      board = d.createElement('canvas'),
+      board = d.createElement`canvas`,
       bs = board.style,
-      ctx = board.getContext('2d'),
+      ctx = board.getContext`2d`,
       grid = A(y).fill().map(() => A(x));
 
     bs.position = 'fixed';
@@ -133,10 +133,10 @@ OO.....OO........................
 
   // translate from compressed to format readable by interpretBoardStrings
   const decompressBoardString = compressedBoardString =>
-    compressedBoardString.split('|')
-      .map(r=>r.split('')
-        .map((c,i)=>A(c.charCodeAt(0)-32).fill(i%2 ? 'O' : '.').join(''))
-        .join(''));
+    compressedBoardString.split`|`
+      .map(r=>r.split``
+        .map((c,i)=>A(c.charCodeAt(0)-32).fill(i%2 ? 'O' : '.').join``)
+        .join``);
 
   //interpret initial board state
   const interpretBoardStrings = (ibsStrings) => {
@@ -148,7 +148,7 @@ OO.....OO........................
       centerX = (a) => len(a) < x
         ? A(padWidth).fill('.').concat(a, A(x - len(a) - padWidth).fill('.'))
         : a;
-    return centerY(ibsStrings).map(row=>centerX(row.split('')).map(cell => cell == 'O'))
+    return centerY(ibsStrings).map(row=>centerX(row.split``).map(cell => cell == 'O'))
   }
 
   // define conway rules
