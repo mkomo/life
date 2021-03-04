@@ -8,6 +8,15 @@ l = () => {
     w = win.innerWidth,
     h = win.innerHeight,
     boundaryCondition = BOUNDARY_CONDITION_WRAP,
+    ibsc = `8!
+6!!!
+,"&","
++!#!$","
+ "(!%!#"
+ "(!#!!"$!!!
+*!%!'!
++!#!
+,"`,
     ibs = `........................O
 ......................O.O
 ............OO......OO............OO
@@ -101,9 +110,23 @@ OO........O...O.OO....O.O
     return d.body.appendChild(board);
   }
 
+  // Utility method used to translate from `cells` format to compressed
+  const compressBoardString = boardString =>
+    boardString.split('\n')
+      .map(b=>b.split(/(?<=O+)(?=\.+)|(?<=\.+)(?=O+)/) //zero-width regex for any time the string changes from . to O or vice versa
+        .map((a,i)=>(!i && a[0] =='O' ? ' ' : '')+String.fromCharCode(len(a)+32))
+        .join(''));
+
+  // translate from compressed to format readable by interpretBoardStrings
+  const decompressBoardString = compressedBoardString =>
+    compressedBoardString.split('\n')
+      .map(r=>r.split('')
+        .map((c,i)=>A(c.charCodeAt(0)-32).fill(i%2 ? 'O' : '.').join(''))
+        .join(''));
+
   //interpret initial board state
-  const interpretBoardString = (ibsString) => {
-    const maxWidth = M.min(M.max(...ibsString.split('\n').map(len)), x),
+  const interpretBoardStrings = (ibsStrings) => {
+    const maxWidth = M.min(M.max(...ibsStrings.map(len)), x),
       padWidth = ~~((x - maxWidth)/2),
       centerY = (a) => len(a) < y
         ? A(~~((y - len(a))/2)).fill('').concat(a, A(M.ceil((y - len(a))/2)).fill(''))
@@ -111,7 +134,7 @@ OO........O...O.OO....O.O
       centerX = (a) => len(a) < x
         ? A(padWidth).fill('.').concat(a, A(x - len(a) - padWidth).fill('.'))
         : a;
-    return centerY(ibsString.split('\n')).map(row=>centerX(row.split('')).map(cell => cell == 'O'))
+    return centerY(ibsStrings).map(row=>centerX(row.split('')).map(cell => cell == 'O'))
   }
 
   // define conway rules
@@ -132,9 +155,10 @@ OO........O...O.OO....O.O
   }
 
   // set up the board and the board state
-  // let board = location.search ? makeBoardSvg() : makeBoardCanvas(), boardState = interpretBoardString(ibs);
-  let board = makeBoardCanvas(), boardState = interpretBoardString(ibs);
-  // let board = makeBoardSvg(), boardState = interpretBoardString(ibs);
+  // let board = location.search ? makeBoardSvg() : makeBoardCanvas(), boardState = interpretBoardStrings(ibs.split('\n'));
+  // let board = makeBoardCanvas(), boardState = interpretBoardStrings(ibs.split('\n'));
+  let board = makeBoardCanvas(), boardState = interpretBoardStrings(decompressBoardString(ibsc));
+  // let board = makeBoardSvg(), boardState = interpretBoardStrings(ibs.split('\n'));
 
   // run the animation
   setInterval(() => {
