@@ -8,8 +8,8 @@ l = () => {
     w = win.innerWidth,
     h = win.innerHeight,
     boundaryCondition = BOUNDARY_CONDITION_WRAP,
-    gosperCompressed = `8!|6!!!|,"&","|+!#!$","| "(!%!#"| "(!#!!"$!!!|*!%!'!|+!#!|,"`,
-    simkinCompressed = ` "%"8| "%"8|A|$";|$";|A|A|A|A|6"!"&|5!%!%|5!&!""|5##!#"|:!&|A|A|A|4"+|4!,|5#)|7!)`,
+    gosperCompressed = `@)|>)))|4*.*4*|3)+),*4*|(*0)-)+*|(*0)+))*,)))|2)-)/)|3)+)|4*`,
+    simkinCompressed = `(*-*@|(*-*@|I|,*C|,*C|I|I|I|I|>*)*.|=)-)-|=).)**|=++)+*|B).|I|I|I|<*3|<)4|=+1|?)1`,
     gosper = `........................O
 ......................O.O
 ............OO......OO............OO
@@ -109,8 +109,6 @@ OO.....OO........................
     board[sA]('width', w);
     board[sA]('height', h);
 
-    // TODO draw grid
-
     board.go = (i, j, value) => {
       if (value != grid[j][i]) {
         grid[j][i] = value;
@@ -127,14 +125,14 @@ OO.....OO........................
   const compressBoardString = boardString =>
     boardString.split('\n')
       .map(b=>b.split(/(?<=O+)(?=\.+)|(?<=\.+)(?=O+)/) //zero-width regex for any time the string changes from . to O or vice versa
-        .map((a,i)=>(!i && a[0] =='O' ? ' ' : '')+String.fromCharCode(a.length+32))
+        .map((a,i)=>(!i && a[0] =='O' ? '(' : '')+String.fromCharCode(a.length+40))
         .join('')).join('|');
 
   // translate from compressed to format readable by interpretBoardStrings
   const decompressBoardString = compressedBoardString =>
     compressedBoardString.split`|`
       .map(r=>r.split``
-        .map((c,i)=>A(c.charCodeAt(0)-32).fill(i%2 ? 'O' : '.').join``)
+        .map((c,i)=>A(c.charCodeAt(0)-40).fill(i%2 ? 'O' : '.').join``)
         .join``);
 
   //interpret initial board state
