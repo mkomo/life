@@ -42,7 +42,6 @@ OO.....OO........................
 .......................O.........`, // https://www.conwaylife.com/patterns/simkinglidergun.cells
     t = DEFAULT_UPDATE_TIME,
     d = document,
-    M = Math,
     A = Array,
     len = b => b.length,
     cellSize = MIN_CELL_SIZE,
@@ -89,7 +88,7 @@ OO.....OO........................
     }
     board.go = (i, j, value) => {
       const cell = grid[i][j];
-      if (value !== cell.value) {
+      if (value != cell.value) {
         cell.value = value;
         cell[sA]('style', `fill:#09c;stroke:#03c;stroke-width:1;fill-opacity:0.${value ? 9 : 1};stroke-opacity:0.9;`) //TODO simplify this
       }
@@ -113,7 +112,7 @@ OO.....OO........................
     // TODO draw grid
 
     board.go = (i, j, value) => {
-      if (value !== grid[j][i]) {
+      if (value != grid[j][i]) {
         grid[j][i] = value;
         ctx.fillStyle = `rgba(0,48,192,0.${value ? 9 : 1})`;
         ctx.clearRect(i*cellSize, j*cellSize, cellSize, cellSize);
@@ -140,10 +139,9 @@ OO.....OO........................
 
   //interpret initial board state
   const interpretBoardStrings = (ibsStrings) => {
-    const maxWidth = M.min(M.max(...ibsStrings.map(len)), x),
-      padWidth = ~~((x - maxWidth)/2),
+    const padWidth = ~~((x - Math.max(...ibsStrings.map(len)))/2),
       centerY = (a) => len(a) < y
-        ? A(~~((y - len(a))/2)).fill('').concat(a, A(M.ceil((y - len(a))/2)).fill(''))
+        ? A(~~((y - len(a))/2)).fill('').concat(a, A(Math.ceil((y - len(a))/2)).fill(''))
         : a,
       centerX = (a) => len(a) < x
         ? A(padWidth).fill('.').concat(a, A(x - len(a) - padWidth).fill('.'))
