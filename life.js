@@ -9,7 +9,7 @@ l = () => {
     h = win.innerHeight,
     boundaryCondition = BOUNDARY_CONDITION_WRAP,
     gosperCompressed = `@)|>)))|4*.*4*|3)+),*4*|(*0)-)+*|(*0)+))*,)))|2)-)/)|3)+)|4*`,
-    simkinCompressed = `(*-*@|(*-*@|I|,*C|,*C|I|I|I|I|>*)*.|=)-)-|=).)**|=++)+*|B).|I|I|I|<*3|<)4|=+1|?)1`,
+    simkinCompressed = `(*-*|(*-*||,*|,*|||||>*)*|=)-)|=).)**|=++)+*|B)||||<*|<)|=+|?)`,
     gosper = `........................O
 ......................O.O
 ............OO......OO............OO
@@ -122,10 +122,11 @@ OO.....OO........................
   }
 
   // Utility method used to translate from `cells` format to compressed
+  // Valid only if max contiguous string is less than 52 characters (due to escaping \ at charcode 92)
   const compressBoardString = boardString =>
     boardString.split('\n')
       .map(b=>b.split(/(?<=O+)(?=\.+)|(?<=\.+)(?=O+)/) //zero-width regex for any time the string changes from . to O or vice versa
-        .map((a,i)=>(!i && a[0] =='O' ? '(' : '')+String.fromCharCode(a.length+40))
+        .map((a,i,arr)=>(arr.length == i + 1 && arr[i][0] == '.') ? '' : ((!i && a[0] =='O' ? '(' : '')+String.fromCharCode(a.length+40)))
         .join('')).join('|');
 
   // translate from compressed to format readable by interpretBoardStrings
