@@ -1,6 +1,6 @@
 #!/bin/bash
 
-UGLIFY_COMMAND="uglifyjs -e  --compress --mangle --toplevel --beautify beautify=false,quote_style=3"
+UGLIFY_COMMAND="uglifyjs -e  --compress --mangle --toplevel --beautify beautify=false,quote_style=1"
 
 if [ "$1" = "help" ]; then
   echo "$0 [(staged|expanded|freq|wc|help)]"
