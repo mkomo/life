@@ -8,16 +8,9 @@ l = () => {
     w = win.innerWidth,
     h = win.innerHeight,
     boundaryCondition = BOUNDARY_CONDITION_WRAP,
-    ibsc = `8!
-6!!!
-,"&","
-+!#!$","
- "(!%!#"
- "(!#!!"$!!!
-*!%!'!
-+!#!
-,"`,
-    ibs = `........................O
+    gosperCompressed = `8!|6!!!|,"&","|+!#!$","| "(!%!#"| "(!#!!"$!!!|*!%!'!|+!#!|,"`,
+    simkinCompressed = ` "%"8| "%"8|A|$";|$";|A|A|A|A|6"!"&|5!%!%|5!&!""|5##!#"|:!&|A|A|A|4"+|4!,|5#)|7!)`,
+    gosper = `........................O
 ......................O.O
 ............OO......OO............OO
 ...........O...O....OO............OO
@@ -26,6 +19,27 @@ OO........O...O.OO....O.O
 ..........O.....O.......O
 ...........O...O
 ............OO`, //https://www.conwaylife.com/patterns/gosperglidergun.cells
+    simkin = `OO.....OO........................
+OO.....OO........................
+.................................
+....OO...........................
+....OO...........................
+.................................
+.................................
+.................................
+.................................
+......................OO.OO......
+.....................O.....O.....
+.....................O......O..OO
+.....................OOO...O...OO
+..........................O......
+.................................
+.................................
+.................................
+....................OO...........
+....................O............
+.....................OOO.........
+.......................O.........`, // https://www.conwaylife.com/patterns/simkinglidergun.cells
     t = DEFAULT_UPDATE_TIME,
     d = document,
     M = Math,
@@ -114,12 +128,12 @@ OO........O...O.OO....O.O
   const compressBoardString = boardString =>
     boardString.split('\n')
       .map(b=>b.split(/(?<=O+)(?=\.+)|(?<=\.+)(?=O+)/) //zero-width regex for any time the string changes from . to O or vice versa
-        .map((a,i)=>(!i && a[0] =='O' ? ' ' : '')+String.fromCharCode(len(a)+32))
-        .join(''));
+        .map((a,i)=>(!i && a[0] =='O' ? ' ' : '')+String.fromCharCode(a.length+32))
+        .join('')).join('|');
 
   // translate from compressed to format readable by interpretBoardStrings
   const decompressBoardString = compressedBoardString =>
-    compressedBoardString.split('\n')
+    compressedBoardString.split('|')
       .map(r=>r.split('')
         .map((c,i)=>A(c.charCodeAt(0)-32).fill(i%2 ? 'O' : '.').join(''))
         .join(''));
@@ -155,10 +169,10 @@ OO........O...O.OO....O.O
   }
 
   // set up the board and the board state
-  // let board = location.search ? makeBoardSvg() : makeBoardCanvas(), boardState = interpretBoardStrings(ibs.split('\n'));
-  // let board = makeBoardCanvas(), boardState = interpretBoardStrings(ibs.split('\n'));
-  let board = makeBoardCanvas(), boardState = interpretBoardStrings(decompressBoardString(ibsc));
-  // let board = makeBoardSvg(), boardState = interpretBoardStrings(ibs.split('\n'));
+  // let board = location.search ? makeBoardSvg() : makeBoardCanvas(), boardState = interpretBoardStrings(gosper.split('\n'));
+  // let board = makeBoardCanvas(), boardState = interpretBoardStrings(gosper.split('\n'));
+  let board = makeBoardCanvas(), boardState = interpretBoardStrings(decompressBoardString(gosperCompressed));
+  // let board = makeBoardSvg(), boardState = interpretBoardStrings(gosper.split('\n'));
 
   // run the animation
   setInterval(() => {
