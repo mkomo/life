@@ -1,16 +1,17 @@
 #!/bin/bash
 
+UGLIFY_COMMAND="uglifyjs -e  --compress --mangle --toplevel --beautify beautify=false,quote_style=3"
+
 if [ "$1" = "help" ]; then
   echo "$0 [(staged|expanded|freq|wc|help)]"
 elif [ "$1" = "staged" ]; then
-  uglifyjs -e  --compress --mangle --toplevel -- <(git show :life.js)
+  $UGLIFY_COMMAND -- <(git show :life.js)
 elif [ "$1" = "expanded" ]; then
-  uglifyjs -b -- <(uglifyjs -e --compress --mangle --toplevel -- life.js)
+  uglifyjs --beautify quote_style=3 -- <($UGLIFY_COMMAND -- life.js)
 elif [ "$1" = "freq" ]; then
-  uglifyjs -e  --compress --mangle --toplevel -- life.js | sed -e "s/[^a-zA-Z]/ /g"  -e "s/  */ /g" | tr " " "\n" | dtk uc
+  $UGLIFY_COMMAND -- life.js | sed -e "s/[^a-zA-Z]/ /g"  -e "s/  */ /g" | tr " " "\n" | dtk uc
 elif [ "$1" = "wc" ]; then
-  uglifyjs -e  --compress --mangle --toplevel -- life.js | wc
+  $UGLIFY_COMMAND -- life.js | wc
 else
-  uglifyjs -e  --compress --mangle --toplevel -- life.js
+  $UGLIFY_COMMAND -- life.js
 fi
-
